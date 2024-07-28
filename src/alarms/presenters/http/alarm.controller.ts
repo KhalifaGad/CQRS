@@ -1,18 +1,21 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { AlarmService } from 'src/alarms/application/alarm.service';
-import { CreateAlarmDto } from './dto/create-alarm.dto';
+import { Body, Controller, Get, Post } from "@nestjs/common";
+import { AlarmFacade } from "src/alarms/application/alarm-facade";
+import { CreateAlarmCommand } from "src/alarms/application/commands/create-alarm.command";
+import { CreateAlarmDto } from "./dto/create-alarm.dto";
 
-@Controller('alarms')
+@Controller("alarms")
 export class AlarmController {
-  constructor(private readonly alarmService: AlarmService) {}
+  constructor(private readonly alarmFacade: AlarmFacade) {}
 
   @Post()
   async create(@Body() payload: CreateAlarmDto) {
-    return this.alarmService.create(payload);
+    return this.alarmFacade.create(
+      new CreateAlarmCommand(payload.name, payload.severity),
+    );
   }
 
   @Get()
   async findAll() {
-    return this.alarmService.findAll();
+    return this.alarmFacade.findAll();
   }
 }
