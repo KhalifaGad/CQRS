@@ -12,7 +12,7 @@ export class AlarmCreatedEventHandler
 
   async handle(event: AlarmCreatedEvent) {
     const alarm = event.alarm;
-    // TODO: Implement the transactional inbox/outbox pattern
+
     await this.materializedAlarmWriteRepository.upsert({
       id: alarm.id,
       name: alarm.name,

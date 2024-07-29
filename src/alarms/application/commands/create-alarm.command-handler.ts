@@ -23,8 +23,6 @@ export class CreateAlarmCommandHandler
     );
     const newAlarm = await this.alarmRepository.save(alarm);
 
-    // TODO: enhance alarm publishing to follow best practices!.
-    //  (e.g. transactional outbox pattern, publish from aggregate root, the publish method itself)
     this.eventBus.publish(new AlarmCreatedEvent(newAlarm));
     return newAlarm;
   }
