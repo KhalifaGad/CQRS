@@ -1,3 +1,3 @@
 ## About
 
-A simple example of CQRS with nestjs.
+A simple example of hexagonal && CQRS with nestjs.
