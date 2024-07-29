@@ -3,12 +3,13 @@ import {
   Global,
   InternalServerErrorException,
   Module,
-} from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApplicationBootstrapOptions } from 'src/common/interfaces/application-bootstrap.options';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import configuration, { IPostgresDatabaseConfig } from './configuration';
+} from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { MongooseModule } from "@nestjs/mongoose";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ApplicationBootstrapOptions } from "src/common/interfaces/application-bootstrap.options";
+import { SnakeNamingStrategy } from "typeorm-naming-strategies";
+import configuration, { IPostgresDatabaseConfig } from "./configuration";
 
 @Global()
 @Module({
@@ -16,7 +17,7 @@ import configuration, { IPostgresDatabaseConfig } from './configuration';
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ".env",
     }),
   ],
 })
@@ -24,20 +25,20 @@ export class ConfigurationModule {
   static forRoot(options: ApplicationBootstrapOptions) {
     const imports: DynamicModule[] = [];
 
-    if (options.driver === 'orm') {
+    if (options.driver === "orm") {
       imports.push(
         TypeOrmModule.forRootAsync({
           imports: [ConfigModule],
           useFactory: (configService: ConfigService) => {
             const databaseConfig =
-              configService.get<IPostgresDatabaseConfig>('postgres');
+              configService.get<IPostgresDatabaseConfig>("postgres");
             if (!databaseConfig)
               throw new InternalServerErrorException(
-                'Cannot find database configuration',
+                "Cannot find database configuration",
               );
 
             return {
-              type: 'postgres',
+              type: "postgres",
               debug: true,
               host: databaseConfig.host,
               port: databaseConfig.port,
@@ -47,6 +48,18 @@ export class ConfigurationModule {
               synchronize: true,
               autoLoadEntities: true,
               namingStrategy: new SnakeNamingStrategy(),
+            };
+          },
+          inject: [ConfigService],
+        }),
+      );
+
+      imports.push(
+        MongooseModule.forRootAsync({
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => {
+            return {
+              uri: configService.get<string>("mongoUri"),
             };
           },
           inject: [ConfigService],

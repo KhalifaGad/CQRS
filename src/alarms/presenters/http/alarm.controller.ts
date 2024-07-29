@@ -10,7 +10,12 @@ export class AlarmController {
   @Post()
   async create(@Body() payload: CreateAlarmDto) {
     return this.alarmFacade.create(
-      new CreateAlarmCommand(payload.name, payload.severity),
+      new CreateAlarmCommand(
+        payload.name,
+        payload.severity,
+        payload.triggeredAt,
+        payload.items,
+      ),
     );
   }
 

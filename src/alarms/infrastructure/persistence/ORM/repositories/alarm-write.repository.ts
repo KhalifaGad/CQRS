@@ -3,11 +3,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Alarm } from "src/alarms/domain/alarm";
 import { AlarmMapper } from "../mappers/alarm.mapper";
 import { Repository } from "typeorm";
-import { AlarmRepository } from "src/alarms/application/ports/alarm.repository";
+import { AlarmWriteRepository } from "src/alarms/application/ports/alarm-write.repository";
 import { AlarmEntity } from "../entities/alarm.entity";
 
 @Injectable()
-export class OrmAlarmRepository implements AlarmRepository {
+export class OrmAlarmWriteRepository implements AlarmWriteRepository {
   constructor(
     @InjectRepository(AlarmEntity)
     private readonly alarmRepository: Repository<AlarmEntity>,
@@ -18,12 +18,11 @@ export class OrmAlarmRepository implements AlarmRepository {
     const alarmEntity = await this.alarmRepository.save({
       ...persistentModel,
       id: alarm.id ?? undefined,
+      items: persistentModel.items.map((item) => ({
+        ...item,
+        id: item.id ?? undefined,
+      })),
     });
     return AlarmMapper.toDomain(alarmEntity);
-  }
-
-  async findAll() {
-    const alarmEntities = await this.alarmRepository.find();
-    return alarmEntities.map(AlarmMapper.toDomain);
   }
 }

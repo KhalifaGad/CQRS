@@ -7,6 +7,7 @@ export default (): IEnv => ({
     password: String(process.env.POSTGRES_PASSWORD),
     name: String(process.env.POSTGRES_DATABASE_NAME),
   },
+  mongoUri: String(process.env.MONGO_URI),
 });
 
 export interface IPostgresDatabaseConfig {
@@ -20,4 +21,5 @@ export interface IPostgresDatabaseConfig {
 export interface IEnv {
   port: number;
   postgres: IPostgresDatabaseConfig;
+  mongoUri: string;
 }
